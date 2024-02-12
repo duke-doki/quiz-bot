@@ -1,8 +1,11 @@
 import random
+import os
 
 
 def get_quiz_pairs():
-    with open('1vs1200.txt', 'r', encoding='KOI8-R') as file:
+    current_directory = os.getcwd()
+    file_path = os.path.join(current_directory, '1vs1200.txt')
+    with open(file_path, 'r', encoding='KOI8-R') as file:
         lines = file.readlines()
     question_answer_pairs = {}
     question = ''
