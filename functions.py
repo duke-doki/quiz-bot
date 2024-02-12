@@ -2,7 +2,7 @@ import random
 
 
 def get_quiz_pairs():
-    with open('1vs1200.txt', 'r', encoding='KOI8-R') as file:
+    with open('/opt/quiz-bot/1vs1200.txt', 'r', encoding='KOI8-R') as file:
         lines = file.readlines()
     question_answer_pairs = {}
     question = ''
