@@ -13,7 +13,6 @@ from questions_handler import get_quiz_pairs, get_question
 
 def handle_new_question_request(event, vk_api, keyboard):
     user_id = event.user_id
-    quiz = get_quiz_pairs(txt_file)
     question = get_question(quiz)
     r.set(user_id, question)
     stored_question = r.get(user_id)
@@ -28,7 +27,6 @@ def handle_new_question_request(event, vk_api, keyboard):
 
 def handle_solution_attempt(event, vk_api, keyboard):
     user_id = event.user_id
-    quiz = get_quiz_pairs(txt_file)
     if r.get(user_id):
         stored_question = r.get(user_id)
         decoded_question = stored_question.decode('utf-8')
@@ -69,7 +67,6 @@ def handle_solution_attempt(event, vk_api, keyboard):
 
 def concede_defeat(event, vk_api, keyboard):
     user_id = event.user_id
-    quiz = get_quiz_pairs(txt_file)
     stored_question = r.get(user_id)
     decoded_question = stored_question.decode('utf-8')
     correct_answer = quiz[decoded_question]
@@ -102,6 +99,7 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
     txt_file = args.txt_file
+    quiz = get_quiz_pairs(txt_file)
     try:
         r = redis.Redis(host='localhost', port=6379, db=0)
         keyboard = VkKeyboard(one_time=True)

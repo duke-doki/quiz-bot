@@ -33,7 +33,6 @@ def start(update, context):
 
 def handle_new_question_request(update, context):
     user_id = update.effective_user.id
-    quiz = get_quiz_pairs(txt_file)
     question = get_question(quiz)
     r.set(user_id, question)
     stored_question = r.get(user_id)
@@ -52,7 +51,6 @@ def handle_new_question_request(update, context):
 
 def handle_solution_attempt(update, context):
     user_id = update.effective_user.id
-    quiz = get_quiz_pairs(txt_file)
     if r.get(user_id):
         stored_question = r.get(user_id)
         decoded_question = stored_question.decode('utf-8')
@@ -93,7 +91,6 @@ def handle_solution_attempt(update, context):
 
 def concede_defeat(update, context):
     user_id = update.effective_user.id
-    quiz = get_quiz_pairs(txt_file)
     stored_question = r.get(user_id)
     decoded_question = stored_question.decode('utf-8')
     correct_answer = quiz[decoded_question]
@@ -122,6 +119,7 @@ if __name__ == '__main__':
     )
     args = parser.parse_args()
     txt_file = args.txt_file
+    quiz = get_quiz_pairs(txt_file)
     try:
         r = redis.Redis(host='localhost', port=6379, db=0)
         updater = Updater(tg_token)
