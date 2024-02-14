@@ -50,12 +50,12 @@ MASTER_ID=42...
 
 Launch on Linux(Python 3) or Windows:
 ```bash
-python tg_quiz_bot.py
+python tg_quiz_bot.py 'txt_file'
 ```
 ```bash
-python vk_quiz_bot.py
+python vk_quiz_bot.py 'txt_file'
 ```
-
+*txt_file content's structure must look like [1vs1200.txt](https://github.com/duke-doki/quiz-bot/blob/main/1vs1200.txt).
 ## Project Goals
 
 The code is written for educational purposes on online-course for web-developers [dvmn.org](https://dvmn.org/).

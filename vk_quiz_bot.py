@@ -1,3 +1,4 @@
+import argparse
 import random
 
 import redis
@@ -12,7 +13,7 @@ from questions_handler import get_quiz_pairs, get_question
 
 def handle_new_question_request(event, vk_api, keyboard):
     user_id = event.user_id
-    quiz = get_quiz_pairs()
+    quiz = get_quiz_pairs(txt_file)
     question = get_question(quiz)
     r.set(user_id, question)
     stored_question = r.get(user_id)
@@ -27,7 +28,7 @@ def handle_new_question_request(event, vk_api, keyboard):
 
 def handle_solution_attempt(event, vk_api, keyboard):
     user_id = event.user_id
-    quiz = get_quiz_pairs()
+    quiz = get_quiz_pairs(txt_file)
     if r.get(user_id):
         stored_question = r.get(user_id)
         decoded_question = stored_question.decode('utf-8')
@@ -68,7 +69,7 @@ def handle_solution_attempt(event, vk_api, keyboard):
 
 def concede_defeat(event, vk_api, keyboard):
     user_id = event.user_id
-    quiz = get_quiz_pairs()
+    quiz = get_quiz_pairs(txt_file)
     stored_question = r.get(user_id)
     decoded_question = stored_question.decode('utf-8')
     correct_answer = quiz[decoded_question]
@@ -92,6 +93,15 @@ if __name__ == "__main__":
     vk_token = env.str('VK_TOKEN')
     tg_token = env.str('TG_TOKEN')
     master_id = env.str('MASTER_ID')
+    parser = argparse.ArgumentParser(
+        description='This script allows to run a quiz via tg bot'
+    )
+    parser.add_argument(
+        'txt_file',
+        help="enter the txt file name"
+    )
+    args = parser.parse_args()
+    txt_file = args.txt_file
     try:
         r = redis.Redis(host='localhost', port=6379, db=0)
         keyboard = VkKeyboard(one_time=True)

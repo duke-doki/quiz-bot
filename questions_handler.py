@@ -2,9 +2,9 @@ import random
 import os
 
 
-def get_quiz_pairs():
+def get_quiz_pairs(txt_file):
     current_directory = os.getcwd()
-    file_path = os.path.join(current_directory, '1vs1200.txt')
+    file_path = os.path.join(current_directory, txt_file)
     with open(file_path, 'r', encoding='KOI8-R') as file:
         lines = file.readlines()
     question_answer_pairs = {}
