@@ -11,15 +11,17 @@ def get_quiz_pairs(txt_file):
     question = ''
     answer = ''
     for index, line in enumerate(lines):
-        if line.startswith('Вопрос'):
+        if line.startswith('Вопрос') or line.startswith('Ответ'):
             for current_line in lines[index + 1:]:
-                if not current_line.startswith('Ответ'):
+                if (
+                        not current_line.startswith('Ответ')
+                        and line.startswith('Вопрос')
+                ):
                     question += current_line
-                else:
-                    break
-        if line.startswith('Ответ'):
-            for current_line in lines[index + 1:]:
-                if not current_line == '\n':
+                elif (
+                        not current_line == '\n'
+                        and line.startswith('Ответ')
+                ):
                     answer += current_line
                 else:
                     break
