@@ -35,10 +35,8 @@ def handle_new_question_request(update, context):
     user_id = update.effective_user.id
     question = get_question(quiz)
     r.set(user_id, question)
-    stored_question = r.get(user_id)
-    decoded_question = stored_question.decode('utf-8')
     update.message.reply_text(
-        decoded_question,
+        question,
         reply_markup=ReplyKeyboardMarkup(
             [
                 ['Новый вопрос', 'Сдаться'],

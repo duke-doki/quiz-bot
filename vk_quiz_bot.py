@@ -15,11 +15,9 @@ def handle_new_question_request(event, vk_api, keyboard):
     user_id = event.user_id
     question = get_question(quiz)
     r.set(user_id, question)
-    stored_question = r.get(user_id)
-    decoded_question = stored_question.decode('utf-8')
     vk_api.messages.send(
         user_id=user_id,
-        message=decoded_question,
+        message=question,
         random_id=random.randint(1, 1000),
         keyboard=keyboard.get_keyboard(),
     )
