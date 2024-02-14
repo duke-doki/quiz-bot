@@ -11,7 +11,7 @@ from telegram.ext import (
     ConversationHandler
 )
 
-from functions import get_question, get_quiz_pairs
+from questions_handler import get_question, get_quiz_pairs
 from vk_quiz_bot import error_handler
 
 logger = logging.getLogger(__name__)

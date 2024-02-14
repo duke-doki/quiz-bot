@@ -7,7 +7,7 @@ from environs import Env
 from vk_api.keyboard import VkKeyboard
 from vk_api.longpoll import VkLongPoll, VkEventType
 
-from functions import get_quiz_pairs, get_question
+from questions_handler import get_quiz_pairs, get_question
 
 
 def handle_new_question_request(event, vk_api, keyboard):
