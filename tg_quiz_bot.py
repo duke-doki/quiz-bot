@@ -31,10 +31,10 @@ def start(update, context):
     return QUESTION
 
 
-def handle_new_question_request(update, context):
+def handle_new_question_request(update, context, database):
     user_id = update.effective_user.id
     question = get_question(quiz)
-    r.set(user_id, question)
+    database.set(user_id, question)
     update.message.reply_text(
         question,
         reply_markup=ReplyKeyboardMarkup(
@@ -47,10 +47,10 @@ def handle_new_question_request(update, context):
     return ANSWER
 
 
-def handle_solution_attempt(update, context):
+def handle_solution_attempt(update, context, database):
     user_id = update.effective_user.id
-    if r.get(user_id):
-        stored_question = r.get(user_id)
+    if database.get(user_id):
+        stored_question = database.get(user_id)
         decoded_question = stored_question.decode('utf-8')
         answer = update.message.text
         correct_answer = quiz[decoded_question]
@@ -60,9 +60,9 @@ def handle_solution_attempt(update, context):
             correct_answer_parts = correct_answer.split('.')
         correct_answer_prefix = correct_answer_parts[0].strip()
         if answer == 'Новый вопрос':
-            return handle_new_question_request(update, context)
+            return handle_new_question_request(update, context, database)
         if answer == 'Сдаться':
-            return concede_defeat(update, context)
+            return concede_defeat(update, context, database)
         elif correct_answer_prefix in answer:
             update.message.reply_text(
                 "Правильно! Поздравляю! "
@@ -87,16 +87,16 @@ def handle_solution_attempt(update, context):
             return ANSWER
 
 
-def concede_defeat(update, context):
+def concede_defeat(update, context, database):
     user_id = update.effective_user.id
-    stored_question = r.get(user_id)
+    stored_question = database.get(user_id)
     decoded_question = stored_question.decode('utf-8')
     correct_answer = quiz[decoded_question]
     context.bot.send_message(
         chat_id=user_id,
         text=f'Правильный ответ: {correct_answer}\nСледующий вопрос:'
     )
-    return handle_new_question_request(update, context)
+    return handle_new_question_request(update, context, database)
 
 
 if __name__ == '__main__':
@@ -131,19 +131,31 @@ if __name__ == '__main__':
                 QUESTION: [
                     MessageHandler(
                         Filters.regex(r'^Новый вопрос$'),
-                        handle_new_question_request
+                        lambda update, context: handle_new_question_request(
+                            update,
+                            context,
+                            r
+                        )
                     )
                 ],
                 ANSWER: [
                     MessageHandler(
                         Filters.text,
-                        handle_solution_attempt
+                        lambda update, context: handle_solution_attempt(
+                            update,
+                            context,
+                            r
+                        )
                     )
                 ],
                 GIVE_UP: [
                     MessageHandler(
                         Filters.regex(r'^Сдаться$'),
-                        concede_defeat
+                        lambda update, context: concede_defeat(
+                            update,
+                            context,
+                            r
+                        )
                     )
                 ],
             },

@@ -11,10 +11,10 @@ from vk_api.longpoll import VkLongPoll, VkEventType
 from questions_handler import get_quiz_pairs, get_question
 
 
-def handle_new_question_request(event, vk_api, keyboard):
+def handle_new_question_request(event, vk_api, keyboard, database):
     user_id = event.user_id
     question = get_question(quiz)
-    r.set(user_id, question)
+    database.set(user_id, question)
     vk_api.messages.send(
         user_id=user_id,
         message=question,
@@ -23,10 +23,10 @@ def handle_new_question_request(event, vk_api, keyboard):
     )
 
 
-def handle_solution_attempt(event, vk_api, keyboard):
+def handle_solution_attempt(event, vk_api, keyboard, database):
     user_id = event.user_id
-    if r.get(user_id):
-        stored_question = r.get(user_id)
+    if database.get(user_id):
+        stored_question = database.get(user_id)
         decoded_question = stored_question.decode('utf-8')
         answer = event.text
         correct_answer = quiz[decoded_question]
@@ -36,9 +36,14 @@ def handle_solution_attempt(event, vk_api, keyboard):
             correct_answer_parts = correct_answer.split('.')
         correct_answer_prefix = correct_answer_parts[0].strip()
         if answer == 'Новый вопрос':
-            return handle_new_question_request(event, vk_api, keyboard)
+            return handle_new_question_request(
+                event,
+                vk_api,
+                keyboard,
+                database
+            )
         if answer == 'Сдаться':
-            return concede_defeat(event, vk_api, keyboard)
+            return concede_defeat(event, vk_api, keyboard, database)
         elif correct_answer_prefix in answer:
             vk_api.messages.send(
                 user_id=user_id,
@@ -63,9 +68,9 @@ def handle_solution_attempt(event, vk_api, keyboard):
         )
 
 
-def concede_defeat(event, vk_api, keyboard):
+def concede_defeat(event, vk_api, keyboard, database):
     user_id = event.user_id
-    stored_question = r.get(user_id)
+    stored_question = database.get(user_id)
     decoded_question = stored_question.decode('utf-8')
     correct_answer = quiz[decoded_question]
     vk_api.messages.send(
@@ -74,7 +79,7 @@ def concede_defeat(event, vk_api, keyboard):
         random_id=random.randint(1, 1000),
         keyboard=keyboard.get_keyboard(),
     )
-    return handle_new_question_request(event, vk_api, keyboard)
+    return handle_new_question_request(event, vk_api, keyboard, database)
 
 
 def error_handler(text, tg_token, master_id):
@@ -111,12 +116,12 @@ if __name__ == "__main__":
         for event in longpoll.listen():
             if event.type == VkEventType.MESSAGE_NEW and event.to_me:
                 if event.text == "Новый вопрос":
-                    handle_new_question_request(event, vk_api, keyboard)
+                    handle_new_question_request(event, vk_api, keyboard, r)
                 elif event.text == "Сдаться":
-                    concede_defeat(event, vk_api, keyboard)
+                    concede_defeat(event, vk_api, keyboard, r)
                 elif event.text == "Мой счёт":
                     pass
                 else:
-                    handle_solution_attempt(event, vk_api, keyboard)
+                    handle_solution_attempt(event, vk_api, keyboard, r)
     except Exception as e:
         error_handler(e, tg_token, master_id)
