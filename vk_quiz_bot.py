@@ -112,11 +112,11 @@ if __name__ == "__main__":
             if event.type == VkEventType.MESSAGE_NEW and event.to_me:
                 if event.text == "Новый вопрос":
                     handle_new_question_request(event, vk_api, keyboard)
-                if event.text == "Сдаться":
+                elif event.text == "Сдаться":
                     concede_defeat(event, vk_api, keyboard)
-                if event.text == "Мой счёт":
+                elif event.text == "Мой счёт":
                     pass
-                elif event.text not in ["Новый вопрос", "Сдаться", "Мой счёт"]:
+                else:
                     handle_solution_attempt(event, vk_api, keyboard)
     except Exception as e:
         error_handler(e, tg_token, master_id)
