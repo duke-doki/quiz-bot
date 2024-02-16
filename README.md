@@ -58,6 +58,7 @@ python tg_quiz_bot.py 'txt_file'
 python vk_quiz_bot.py 'txt_file'
 ```
 *txt_file content's structure must look like [1vs1200.txt](https://github.com/duke-doki/quiz-bot/blob/main/1vs1200.txt).
+
 **To see optional settings like host, port, etc use:
 ```bash
 python tg_quiz_bot.py -h
