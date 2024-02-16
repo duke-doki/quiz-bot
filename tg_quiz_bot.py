@@ -60,9 +60,9 @@ def handle_solution_attempt(update, context, database, quiz):
             correct_answer_parts = correct_answer.split('.')
         correct_answer_prefix = correct_answer_parts[0].strip()
         if answer == 'Новый вопрос':
-            return handle_new_question_request(update, context, database)
+            return handle_new_question_request(update, context, database, quiz)
         if answer == 'Сдаться':
-            return concede_defeat(update, context, database)
+            return concede_defeat(update, context, database, quiz)
         elif correct_answer_prefix in answer:
             update.message.reply_text(
                 "Правильно! Поздравляю! "
@@ -96,7 +96,7 @@ def concede_defeat(update, context, database, quiz):
         chat_id=user_id,
         text=f'Правильный ответ: {correct_answer}\nСледующий вопрос:'
     )
-    return handle_new_question_request(update, context, database)
+    return handle_new_question_request(update, context, database, quiz)
 
 
 if __name__ == '__main__':
@@ -115,11 +115,22 @@ if __name__ == '__main__':
         'txt_file',
         help="enter the txt file name"
     )
+    parser.add_argument('-lh', '--localhost',
+                        help='enter your host',
+                        default='localhost')
+    parser.add_argument('-p', '--port',
+                        help='enter your port',
+                        type=int,
+                        default=6379)
+    parser.add_argument('-db', '--database',
+                        help='enter your database',
+                        type=int,
+                        default=0)
     args = parser.parse_args()
     txt_file = args.txt_file
     quiz = get_quiz_pairs(txt_file)
     try:
-        r = redis.Redis(host='localhost', port=6379, db=0)
+        r = redis.Redis(host=args.localhost, port=args.port, db=args.database)
         updater = Updater(tg_token)
 
         dispatcher = updater.dispatcher

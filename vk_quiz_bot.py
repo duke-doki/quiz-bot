@@ -40,10 +40,11 @@ def handle_solution_attempt(event, vk_api, keyboard, database, quiz):
                 event,
                 vk_api,
                 keyboard,
-                database
+                database,
+                quiz
             )
         if answer == 'Сдаться':
-            return concede_defeat(event, vk_api, keyboard, database)
+            return concede_defeat(event, vk_api, keyboard, database, quiz)
         elif correct_answer_prefix in answer:
             vk_api.messages.send(
                 user_id=user_id,
@@ -79,7 +80,7 @@ def concede_defeat(event, vk_api, keyboard, database, quiz):
         random_id=random.randint(1, 1000),
         keyboard=keyboard.get_keyboard(),
     )
-    return handle_new_question_request(event, vk_api, keyboard, database)
+    return handle_new_question_request(event, vk_api, keyboard, database, quiz)
 
 
 def error_handler(text, tg_token, master_id):
@@ -100,11 +101,22 @@ if __name__ == "__main__":
         'txt_file',
         help="enter the txt file name"
     )
+    parser.add_argument('-lh', '--localhost',
+                        help='enter your host',
+                        default='localhost')
+    parser.add_argument('-p', '--port',
+                        help='enter your port',
+                        type=int,
+                        default=6379)
+    parser.add_argument('-db', '--database',
+                        help='enter your database',
+                        type=int,
+                        default=0)
     args = parser.parse_args()
     txt_file = args.txt_file
     quiz = get_quiz_pairs(txt_file)
     try:
-        r = redis.Redis(host='localhost', port=6379, db=0)
+        r = redis.Redis(host=args.localhost, port=args.port, db=args.database)
         keyboard = VkKeyboard(one_time=True)
         keyboard.add_button('Новый вопрос')
         keyboard.add_button('Сдаться')
@@ -117,7 +129,7 @@ if __name__ == "__main__":
             if event.type == VkEventType.MESSAGE_NEW and event.to_me:
                 if event.text == "Новый вопрос":
                     handle_new_question_request(
-                        event, 
+                        event,
                         vk_api,
                         keyboard,
                         r,
