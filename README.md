@@ -45,6 +45,8 @@ MASTER_ID=42...
 
 - Get your chat id [here](https://t.me/userinfobot).
 
+- Following [these](https://redis.io/docs/install/install-redis/) instructions install redis on your server.
+
 
 ### Run
 
@@ -56,6 +58,13 @@ python tg_quiz_bot.py 'txt_file'
 python vk_quiz_bot.py 'txt_file'
 ```
 *txt_file content's structure must look like [1vs1200.txt](https://github.com/duke-doki/quiz-bot/blob/main/1vs1200.txt).
+**To see optional settings like host, port, etc use:
+```bash
+python tg_quiz_bot.py -h
+```
+```bash
+python vk_quiz_bot.py -h
+```
 ## Project Goals
 
 The code is written for educational purposes on online-course for web-developers [dvmn.org](https://dvmn.org/).
