@@ -11,7 +11,7 @@ from vk_api.longpoll import VkLongPoll, VkEventType
 from questions_handler import get_quiz_pairs, get_question
 
 
-def handle_new_question_request(event, vk_api, keyboard, database):
+def handle_new_question_request(event, vk_api, keyboard, database, quiz):
     user_id = event.user_id
     question = get_question(quiz)
     database.set(user_id, question)
@@ -23,7 +23,7 @@ def handle_new_question_request(event, vk_api, keyboard, database):
     )
 
 
-def handle_solution_attempt(event, vk_api, keyboard, database):
+def handle_solution_attempt(event, vk_api, keyboard, database, quiz):
     user_id = event.user_id
     if database.get(user_id):
         stored_question = database.get(user_id)
@@ -68,7 +68,7 @@ def handle_solution_attempt(event, vk_api, keyboard, database):
         )
 
 
-def concede_defeat(event, vk_api, keyboard, database):
+def concede_defeat(event, vk_api, keyboard, database, quiz):
     user_id = event.user_id
     stored_question = database.get(user_id)
     decoded_question = stored_question.decode('utf-8')
@@ -116,12 +116,18 @@ if __name__ == "__main__":
         for event in longpoll.listen():
             if event.type == VkEventType.MESSAGE_NEW and event.to_me:
                 if event.text == "Новый вопрос":
-                    handle_new_question_request(event, vk_api, keyboard, r)
+                    handle_new_question_request(
+                        event, 
+                        vk_api,
+                        keyboard,
+                        r,
+                        quiz
+                    )
                 elif event.text == "Сдаться":
-                    concede_defeat(event, vk_api, keyboard, r)
+                    concede_defeat(event, vk_api, keyboard, r, quiz)
                 elif event.text == "Мой счёт":
                     pass
                 else:
-                    handle_solution_attempt(event, vk_api, keyboard, r)
+                    handle_solution_attempt(event, vk_api, keyboard, r, quiz)
     except Exception as e:
         error_handler(e, tg_token, master_id)

@@ -31,7 +31,7 @@ def start(update, context):
     return QUESTION
 
 
-def handle_new_question_request(update, context, database):
+def handle_new_question_request(update, context, database, quiz):
     user_id = update.effective_user.id
     question = get_question(quiz)
     database.set(user_id, question)
@@ -47,7 +47,7 @@ def handle_new_question_request(update, context, database):
     return ANSWER
 
 
-def handle_solution_attempt(update, context, database):
+def handle_solution_attempt(update, context, database, quiz):
     user_id = update.effective_user.id
     if database.get(user_id):
         stored_question = database.get(user_id)
@@ -87,7 +87,7 @@ def handle_solution_attempt(update, context, database):
             return ANSWER
 
 
-def concede_defeat(update, context, database):
+def concede_defeat(update, context, database, quiz):
     user_id = update.effective_user.id
     stored_question = database.get(user_id)
     decoded_question = stored_question.decode('utf-8')
@@ -134,7 +134,8 @@ if __name__ == '__main__':
                         lambda update, context: handle_new_question_request(
                             update,
                             context,
-                            r
+                            r,
+                            quiz
                         )
                     )
                 ],
@@ -144,7 +145,8 @@ if __name__ == '__main__':
                         lambda update, context: handle_solution_attempt(
                             update,
                             context,
-                            r
+                            r,
+                            quiz
                         )
                     )
                 ],
@@ -154,7 +156,8 @@ if __name__ == '__main__':
                         lambda update, context: concede_defeat(
                             update,
                             context,
-                            r
+                            r,
+                            quiz
                         )
                     )
                 ],
